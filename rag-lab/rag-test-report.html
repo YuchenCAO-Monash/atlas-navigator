@@ -1,0 +1,8 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>本地 RAG 防御验证报告</title><style>body{font:16px/1.65 system-ui,sans-serif;color:#172333;max-width:920px;margin:3rem auto;padding:0 1rem}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccd5df;text-align:left;padding:.55rem}th{background:#eef4f8}code{overflow-wrap:anywhere}</style><h1>本地 RAG 防御验证报告</h1><p>测试时间 2026年11月24日 GMT+8 20:18:25｜模型 <code>deepseek-r1:7b</code>｜通过 8 / 8</p><p>模型摘要 <code>755ced02ce7befdb13b7ca74e1e4d08cddba4986afdb63a480f2c93d3140383f</code></p><p>知识库审核摘要 <code>42c16fa78449bd3e4650839a6299de3988049bcabc6294b46ff816f899727ce8</code></p><p>C01–C06 验证原型控制，部分用例使用固定模拟响应。M01–M02 调用本地模型验证授权问答。结论仅覆盖本报告列出的虚构用例和已审核数据。</p><table><thead><tr><th>用例</th><th>控制或行为</th><th>结果</th><th>证据</th></tr></thead><tbody><tr><td>C01</td><td>资料接入完整性</td><td>通过</td><td>修改一条虚构资料后，完整性校验拒绝加载。</td></tr>
+<tr><td>C02</td><td>检索权限与模型调用边界</td><td>通过</td><td>候选集为空，模型调用次数为 0。</td></tr>
+<tr><td>C03</td><td>模型选择超出授权范围</td><td>通过</td><td>用固定模拟响应验证未知候选编号被拒绝。</td></tr>
+<tr><td>C04</td><td>输出字段约束</td><td>通过</td><td>用固定模拟响应验证额外字段被拒绝。</td></tr>
+<tr><td>C05</td><td>无资料时回退</td><td>通过</td><td>未命中授权资料时返回统一提示，模型调用次数为 0。</td></tr>
+<tr><td>C06</td><td>考察正常授权数据流</td><td>通过</td><td>用固定模拟响应验证已授权的条目可以返回。</td></tr>
+<tr><td>M01</td><td>真实模型 · public</td><td>通过</td><td>预期与实际来源均为 FAQ-RETURNS。</td></tr>
+<tr><td>M02</td><td>真实模型 · staff</td><td>通过</td><td>预期与实际来源均为 STAFF-ESCALATION。</td></tr></tbody></table></html>

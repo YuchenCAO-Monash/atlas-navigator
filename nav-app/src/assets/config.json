@@ -1,6 +1,17 @@
 {
     "versions": [
         {
+            "name": "ATLAS v5.6.0",
+            "version": "5.6.0",
+            "domains": [
+                {
+                    "name": "ATLAS",
+                    "identifier": "atlas-atlas",
+                    "data": ["assets/stix-atlas.json"]
+                }
+            ]
+        },
+        {
             "name": "ATT&CK v12",
             "version": "12",
             "domains": [

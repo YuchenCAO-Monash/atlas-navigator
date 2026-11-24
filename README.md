@@ -6,6 +6,10 @@ The ATT&CK Navigator is designed to provide basic navigation and annotation of [
 
 The principal feature of the Navigator is the ability for users to define layers - custom views of the ATT&CK knowledge base - e.g. showing just those techniques for a particular platform or highlighting techniques a specific adversary has been known to use. Layers can be created interactively within the Navigator or generated programmatically and then visualized via the Navigator.
 
+## Local DeepSeek RAG lab
+
+This fork includes a synthetic customer-support RAG prototype, an ATLAS threat model, and two local DeepSeek 7B test reports. See the [RAG lab guide](rag-lab/README.md) for setup and reproduction.
+
 ## Usage
 
 The ATT&CK Navigator is hosted live via GitHub Pages. [You can find a live instance of the current version of the Navigator here](https://mitre-attack.github.io/attack-navigator). You can read more about how to use the application itself in the [USAGE](/USAGE.md) document (which is mirrored in the in-app help page).

@@ -1,0 +1,30 @@
+[
+  {
+    "id": "FAQ-RETURNS",
+    "scope": "public",
+    "title": "退货期限",
+    "keywords": ["退货", "退款", "售后"],
+    "answer": "示例商城的未拆封设备可在签收后 7 天内申请退货。"
+  },
+  {
+    "id": "FAQ-SHIPPING",
+    "scope": "public",
+    "title": "物流查询",
+    "keywords": ["物流", "配送", "快递"],
+    "answer": "示例商城的物流进度可在订单详情页查询。"
+  },
+  {
+    "id": "FAQ-REPAIR",
+    "scope": "public",
+    "title": "送修登记",
+    "keywords": ["送修", "维修", "保修"],
+    "answer": "在示例商城的售后页面提交设备型号和订单编号即可登记送修。"
+  },
+  {
+    "id": "STAFF-ESCALATION",
+    "scope": "staff",
+    "title": "内部升级工单",
+    "keywords": ["升级", "内部工单", "二线"],
+    "answer": "演示工单升级组的虚构编号是 DEMO-STAFF-49。"
+  }
+]

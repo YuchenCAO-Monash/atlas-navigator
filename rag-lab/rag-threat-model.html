@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>本地 RAG 威胁模型与验证指南</title>
+  <style>
+    :root{color-scheme:light;--ink:#162638;--muted:#405467;--line:#cfdbe6;--soft:#edf4f7;--accent:#0b615c}
+    *{box-sizing:border-box}body{margin:0;background:#f3f7f9;color:var(--ink);font:16px/1.65 system-ui,"Microsoft YaHei",sans-serif}
+    main{max-width:1060px;margin:auto;padding:clamp(1rem,4vw,3rem);background:#fff}
+    header{border-bottom:2px solid var(--accent);padding-bottom:1rem}h1{font-size:clamp(1.8rem,4vw,2.65rem);line-height:1.18;margin:.35rem 0 .9rem}
+    h2{font-size:1.35rem;margin-top:2rem}header p{max-width:74ch;color:var(--muted)}
+    code,pre{font:0.93rem/1.55 Consolas,"Courier New",monospace}pre{white-space:pre-wrap;overflow-wrap:anywhere;background:#edf4f7;padding:1rem;border-left:3px solid var(--accent)}
+    .flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:.7rem;list-style:none;padding:0}
+    .flow li{padding:.7rem;border:1px solid var(--line);background:var(--soft)}.flow strong{color:var(--accent);display:block}
+    .table-scroll{overflow:auto}table{width:100%;min-width:770px;border-collapse:collapse}
+    th,td{vertical-align:top;text-align:left;border-bottom:1px solid var(--line);padding:.65rem}
+    th{background:#e8f0f4}td:first-child{width:21%}td:nth-child(2){width:19%}td:nth-child(3){width:31%}
+    small{display:inline-block;margin-top:.35rem;color:var(--muted);font-size:.85rem}
+    a{color:#075e64}li+li{margin-top:.35rem}.flow li+li{margin:0}
+    @media print{body{background:#fff}main{padding:0}.table-scroll{overflow:visible}table{min-width:0}tr{break-inside:avoid}}
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>本地 RAG 威胁模型与验证指南</h1>
+    <p>评估对象是使用 <code>deepseek-r1:7b</code> 的虚构商城客服。原型按关键词检索审核过的文档，模型选择来源，程序校验来源并展示已授权原文。示例角色用于模拟权限，部署时应由可信身份系统提供角色。</p>
+  </header>
+  <section>
+    <h2>数据流与信任边界</h2>
+    <ol class="flow">
+      <li><strong>文档接入</strong>外部资料进入审核区。原型用批准的摘要锁定本地 JSON 数据。</li>
+      <li><strong>检索</strong>用户问题进入查询层。先按角色过滤，再根据关键词选择候选。</li>
+      <li><strong>模型</strong>只将获准候选的内容和问题发送到本机 Ollama。模型只需返回来源编号或空值。</li>
+      <li><strong>输出</strong>应用校验字段和候选编号，再将获准的原文作为纯文本显示。无资料时统一回退。</li>
+    </ol>
+    <p>保护对象包括语料完整性、内部文档、检索权限与用户可见回答。请求参数、外部文档和模型回复均按不受信数据处理。演示使用虚构资料，角色由命令行指定。</p>
+  </section>
+  <section>
+    <h2>ATLAS 风险和防护记录</h2>
+    <div class="table-scroll"><table>
+      <thead><tr><th>边界与 ATLAS 技术</th><th>风险</th><th>已有防护和证据</th><th>待补控制</th></tr></thead>
+      <tbody><tr><td><strong>文档接入</strong><br><code>AML.T0019</code><br>Publish Poisoned Datasets</td><td>来源或发布版本不可信，错误内容进入知识库。</td><td>仅加载固定本地语料，并验证审核版本的 SHA-256。<br><small>C01 验证批准版本被修改后拒绝加载。</small></td><td>对接可信发布源，使用签名和双人发布审批，保留可审计的来源记录。</td></tr>
+<tr><td><strong>文档接入</strong><br><code>AML.T0070</code><br>RAG Poisoning</td><td>被污染的资料持续影响后续检索和回答。</td><td>通过审核摘要固定语料版本。运行时只读取该版本。<br><small>C01 验证未审核的语料变更会被阻断。</small></td><td>限制索引和资料的写入权限，保留版本审计和可验证的回滚路径。</td></tr>
+<tr><td><strong>检索</strong><br><code>AML.T0066</code><br>Retrieval Content Crafting</td><td>表面匹配的内容占据候选位置，降低回答可靠性。</td><td>先按角色筛选，再在审核语料中做关键词匹配。最多读取 3 条候选。<br><small>C02 和 C05 检查权限及无候选时的回退。语义排序效果待验证。</small></td><td>建立检索质量基线，验证近义词、歧义问题与无关候选的排序。</td></tr>
+<tr><td><strong>检索</strong><br><code>AML.T0082</code><br>RAG Credential Harvesting</td><td>知识库中的真实凭据被检索或公开。</td><td>原型语料使用虚构数据，并按示例角色筛选。<br><small>凭据扫描待专项验证。</small></td><td>接入前扫描真实凭据并隔离命中内容，接入可信身份和文档 ACL。</td></tr>
+<tr><td><strong>模型</strong><br><code>AML.T0051</code><br>LLM Prompt Injection</td><td>用户或文档内容影响模型对任务与来源的判断。</td><td>程序在模型调用前完成权限判断。模型仅从获准候选中选择来源，结果经候选白名单校验。<br><small>C03 和 C04 验证应用拒绝未授权来源及额外字段。模型行为待实测。</small></td><td>加入预审的安全评测用例，测量来源误选、过度拒绝和越界结果。</td></tr>
+<tr><td><strong>模型</strong><br><code>AML.T0056</code><br>Extract LLM System Prompt</td><td>内部指令或系统上下文通过回答被披露。</td><td>模型系统规则不存凭据，界面通过应用渲染已审核摘录。<br><small>系统上下文暴露待专项验证。</small></td><td>评审系统上下文和日志，使用虚构标记验证输出泄露边界。</td></tr>
+<tr><td><strong>输出</strong><br><code>AML.T0057</code><br>LLM Data Leakage</td><td>未授权资料通过回答或诊断信息暴露。</td><td>授权过滤在检索和推理之前执行。用户可见答案来自已授权原文。<br><small>C02、C03、C05 验证应用边界。M01 和 M02 验证真实模型的授权问答。</small></td><td>接入可信身份，测试跨租户隔离，添加输出敏感信息检测与脱敏日志。</td></tr>
+<tr><td><strong>输出</strong><br><code>AML.T0067</code><br>LLM Trusted Output Components Manipulation</td><td>下游组件把模型提供的内容当作可信字段或操作指令。</td><td>只接受 sourceId 字段，校验来源，使用源码控制的纯文本渲染。<br><small>C04 验证额外模型字段不会进入用户可见回答。</small></td><td>将来接入网页时验证文本转义和授权约束，对每个下游组件做独立审查。</td></tr></tbody>
+    </table></div>
+    <p>图层用 0 表示待专项验证，1 表示已有局部控制，2 表示限定范围已验证。只有取得证据后才调整分数，备注中保留适用场景和用例编号。</p>
+    <p><a href="https://github.com/mitre-atlas/atlas-navigator-data/tree/main/dist">MITRE ATLAS 数据仓库</a> · <a href="https://github.com/mitre-atlas/atlas-navigator/blob/master/layers/LAYERFORMATv4_3.md">Navigator 图层格式 4.3</a></p>
+  </section>
+  <section>
+    <h2>亲自运行并生成报告</h2>
+    <p>将 <code>rag-assistant.cjs</code> 和 <code>knowledge.json</code> 放在同一目录。使用 Node.js 16.20.2 或更新版本，在 PowerShell 中运行下列命令。<code>check</code> 使用固定模拟响应验证程序边界。<code>check --live</code> 会另外调用本地 7B，并写出同目录的 <code>rag-test-report.html</code>。</p>
+    <pre><code>Set-Location .\rag-lab
+ollama list
+node .\rag-assistant.cjs check
+node .\rag-assistant.cjs ask public "退货期限是多少？"
+node .\rag-assistant.cjs ask public "内部工单升级组是什么？"
+node .\rag-assistant.cjs ask staff "内部工单升级组是什么？"
+node .\rag-assistant.cjs check --live
+Invoke-Item .\rag-test-report.html</code></pre>
+    <p>第二个问答命令应返回统一提示并显示「模型调用 否」。用员工角色重复相同问题，验证授权查询的来源。报告逐项列出通过或失败，结论限于这些虚构用例。</p>
+    <p><a href="https://docs.ollama.com/api/chat">Ollama Chat API</a> · <a href="https://docs.ollama.com/capabilities/structured-outputs">Ollama 结构化输出</a></p>
+  </section>
+  <section>
+    <h2>在 Navigator 里核对结果</h2>
+    <ol>
+      <li>打开本地 ATLAS Navigator，点击 <strong>+</strong>，展开 <strong>Open Existing Layer</strong>，选择 <strong>Upload from local</strong>。</li>
+      <li>导入 <code>atlas-rag-threat-model.json</code>。按编号找到例如 <code>AML.T0057</code>，查看对应边界、已有控制和待办。</li>
+      <li>将自己的报告用例编号和结果补到格子的备注中，再下载更新后的图层。</li>
+    </ol>
+    <p><a href="https://github.com/mitre-atlas/atlas-navigator/blob/master/USAGE.md#saving-and-loading-layers">Navigator 图层导入和导出说明</a></p>
+  </section>
+</main>
+</body>
+</html>

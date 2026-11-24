@@ -1,0 +1,293 @@
+{
+	"name": "本地 DeepSeek RAG 威胁模型",
+	"versions": {
+		"attack": "5",
+		"navigator": "4.7.1",
+		"layer": "4.3"
+	},
+	"domain": "atlas-atlas",
+	"description": "虚构客服 RAG 原型的 8 项威胁映射。评分反映原型防御证据，0 为待专项验证，1 为已有局部控制，2 为限定范围已验证。实际模型推理待你运行。每格备注记录边界、已有防护和待补控制。",
+	"filters": {
+		"platforms": [
+			"ATLAS"
+		]
+	},
+	"sorting": 0,
+	"layout": {
+		"layout": "side",
+		"aggregateFunction": "average",
+		"showID": false,
+		"showName": true,
+		"showAggregateScores": false,
+		"countUnscored": false
+	},
+	"hideDisabled": false,
+	"techniques": [
+		{
+			"techniqueID": "AML.T0019",
+			"tactic": "resource-development",
+			"score": 1,
+			"color": "",
+			"comment": "文档接入。来源或发布版本不可信，错误内容进入知识库。\n已有防护。仅加载固定本地语料，并验证审核版本的 SHA-256。\n待补控制。对接可信发布源，使用签名和双人发布审批，保留可审计的来源记录。\n证据。C01 验证批准版本被修改后拒绝加载。",
+			"enabled": true,
+			"metadata": [
+				{
+					"name": "信任边界",
+					"value": "文档接入"
+				},
+				{
+					"name": "已有防护",
+					"value": "仅加载固定本地语料，并验证审核版本的 SHA-256。"
+				},
+				{
+					"name": "待补控制",
+					"value": "对接可信发布源，使用签名和双人发布审批，保留可审计的来源记录。"
+				},
+				{
+					"name": "验证证据",
+					"value": "C01 验证批准版本被修改后拒绝加载。"
+				}
+			],
+			"links": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "AML.T0070",
+			"tactic": "persistence",
+			"score": 1,
+			"color": "",
+			"comment": "文档接入。被污染的资料持续影响后续检索和回答。\n已有防护。通过审核摘要固定语料版本。运行时只读取该版本。\n待补控制。限制索引和资料的写入权限，保留版本审计和可验证的回滚路径。\n证据。C01 验证未审核的语料变更会被阻断。",
+			"enabled": true,
+			"metadata": [
+				{
+					"name": "信任边界",
+					"value": "文档接入"
+				},
+				{
+					"name": "已有防护",
+					"value": "通过审核摘要固定语料版本。运行时只读取该版本。"
+				},
+				{
+					"name": "待补控制",
+					"value": "限制索引和资料的写入权限，保留版本审计和可验证的回滚路径。"
+				},
+				{
+					"name": "验证证据",
+					"value": "C01 验证未审核的语料变更会被阻断。"
+				}
+			],
+			"links": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "AML.T0066",
+			"tactic": "resource-development",
+			"score": 1,
+			"color": "",
+			"comment": "检索。表面匹配的内容占据候选位置，降低回答可靠性。\n已有防护。先按角色筛选，再在审核语料中做关键词匹配。最多读取 3 条候选。\n待补控制。建立检索质量基线，验证近义词、歧义问题与无关候选的排序。\n证据。C02 和 C05 检查权限及无候选时的回退。语义排序效果待验证。",
+			"enabled": true,
+			"metadata": [
+				{
+					"name": "信任边界",
+					"value": "检索"
+				},
+				{
+					"name": "已有防护",
+					"value": "先按角色筛选，再在审核语料中做关键词匹配。最多读取 3 条候选。"
+				},
+				{
+					"name": "待补控制",
+					"value": "建立检索质量基线，验证近义词、歧义问题与无关候选的排序。"
+				},
+				{
+					"name": "验证证据",
+					"value": "C02 和 C05 检查权限及无候选时的回退。语义排序效果待验证。"
+				}
+			],
+			"links": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "AML.T0082",
+			"tactic": "credential-access",
+			"score": 0,
+			"color": "",
+			"comment": "检索。知识库中的真实凭据被检索或公开。\n已有防护。原型语料使用虚构数据，并按示例角色筛选。\n待补控制。接入前扫描真实凭据并隔离命中内容，接入可信身份和文档 ACL。\n证据。凭据扫描待专项验证。",
+			"enabled": true,
+			"metadata": [
+				{
+					"name": "信任边界",
+					"value": "检索"
+				},
+				{
+					"name": "已有防护",
+					"value": "原型语料使用虚构数据，并按示例角色筛选。"
+				},
+				{
+					"name": "待补控制",
+					"value": "接入前扫描真实凭据并隔离命中内容，接入可信身份和文档 ACL。"
+				},
+				{
+					"name": "验证证据",
+					"value": "凭据扫描待专项验证。"
+				}
+			],
+			"links": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "AML.T0051",
+			"tactic": "execution",
+			"score": 1,
+			"color": "",
+			"comment": "模型。用户或文档内容影响模型对任务与来源的判断。\n已有防护。程序在模型调用前完成权限判断。模型仅从获准候选中选择来源，结果经候选白名单校验。\n待补控制。加入预审的安全评测用例，测量来源误选、过度拒绝和越界结果。\n证据。C03 和 C04 验证应用拒绝未授权来源及额外字段。模型行为待实测。",
+			"enabled": true,
+			"metadata": [
+				{
+					"name": "信任边界",
+					"value": "模型"
+				},
+				{
+					"name": "已有防护",
+					"value": "程序在模型调用前完成权限判断。模型仅从获准候选中选择来源，结果经候选白名单校验。"
+				},
+				{
+					"name": "待补控制",
+					"value": "加入预审的安全评测用例，测量来源误选、过度拒绝和越界结果。"
+				},
+				{
+					"name": "验证证据",
+					"value": "C03 和 C04 验证应用拒绝未授权来源及额外字段。模型行为待实测。"
+				}
+			],
+			"links": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "AML.T0056",
+			"tactic": "exfiltration",
+			"score": 0,
+			"color": "",
+			"comment": "模型。内部指令或系统上下文通过回答被披露。\n已有防护。模型系统规则不存凭据，界面通过应用渲染已审核摘录。\n待补控制。评审系统上下文和日志，使用虚构标记验证输出泄露边界。\n证据。系统上下文暴露待专项验证。",
+			"enabled": true,
+			"metadata": [
+				{
+					"name": "信任边界",
+					"value": "模型"
+				},
+				{
+					"name": "已有防护",
+					"value": "模型系统规则不存凭据，界面通过应用渲染已审核摘录。"
+				},
+				{
+					"name": "待补控制",
+					"value": "评审系统上下文和日志，使用虚构标记验证输出泄露边界。"
+				},
+				{
+					"name": "验证证据",
+					"value": "系统上下文暴露待专项验证。"
+				}
+			],
+			"links": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "AML.T0057",
+			"tactic": "exfiltration",
+			"score": 1,
+			"color": "",
+			"comment": "输出。未授权资料通过回答或诊断信息暴露。\n已有防护。授权过滤在检索和推理之前执行。用户可见答案来自已授权原文。\n待补控制。接入可信身份，测试跨租户隔离，添加输出敏感信息检测与脱敏日志。\n证据。C02、C03、C05 验证应用边界。M01 和 M02 验证真实模型的授权问答。C02 通过。普通用户请求内部工单资料时，授权候选集为空，模型调用次数为 0。证据见 rag-test-report.html。待补控制包括真实身份认证和跨租户隔离测试。",
+			"enabled": true,
+			"metadata": [
+				{
+					"name": "信任边界",
+					"value": "输出"
+				},
+				{
+					"name": "已有防护",
+					"value": "授权过滤在检索和推理之前执行。用户可见答案来自已授权原文。"
+				},
+				{
+					"name": "待补控制",
+					"value": "接入可信身份，测试跨租户隔离，添加输出敏感信息检测与脱敏日志。"
+				},
+				{
+					"name": "验证证据",
+					"value": "C02、C03、C05 验证应用边界。M01 和 M02 验证真实模型的授权问答。"
+				}
+			],
+			"links": [],
+			"showSubtechniques": false
+		},
+		{
+			"techniqueID": "AML.T0067",
+			"tactic": "defense-evasion",
+			"score": 1,
+			"color": "",
+			"comment": "输出。下游组件把模型提供的内容当作可信字段或操作指令。\n已有防护。只接受 sourceId 字段，校验来源，使用源码控制的纯文本渲染。\n待补控制。将来接入网页时验证文本转义和授权约束，对每个下游组件做独立审查。\n证据。C04 验证额外模型字段不会进入用户可见回答。",
+			"enabled": true,
+			"metadata": [
+				{
+					"name": "信任边界",
+					"value": "输出"
+				},
+				{
+					"name": "已有防护",
+					"value": "只接受 sourceId 字段，校验来源，使用源码控制的纯文本渲染。"
+				},
+				{
+					"name": "待补控制",
+					"value": "将来接入网页时验证文本转义和授权约束，对每个下游组件做独立审查。"
+				},
+				{
+					"name": "验证证据",
+					"value": "C04 验证额外模型字段不会进入用户可见回答。"
+				}
+			],
+			"links": [],
+			"showSubtechniques": false
+		}
+	],
+	"gradient": {
+		"colors": [
+			"#dfe5ebff",
+			"#f9d789ff",
+			"#9dcaacff"
+		],
+		"minValue": 0,
+		"maxValue": 2
+	},
+	"legendItems": [
+		{
+			"color": "#DFE5EB",
+			"label": "0 · 待专项验证"
+		},
+		{
+			"color": "#F9D789",
+			"label": "1 · 已有局部控制"
+		},
+		{
+			"color": "#9DCAAC",
+			"label": "2 · 限定范围已验证"
+		}
+	],
+	"metadata": [
+		{
+			"name": "数据集",
+			"value": "MITRE ATLAS v5.6.0"
+		},
+		{
+			"name": "评估对象",
+			"value": "虚构客服 RAG 原型"
+		},
+		{
+			"name": "目标模型",
+			"value": "deepseek-r1:7b"
+		}
+	],
+	"links": [],
+	"showTacticRowBackground": false,
+	"tacticRowBackground": "#dddddd",
+	"selectTechniquesAcrossTactics": false,
+	"selectSubtechniquesWithParent": false
+}
